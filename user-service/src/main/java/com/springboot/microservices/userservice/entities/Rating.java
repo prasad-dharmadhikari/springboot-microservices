@@ -13,9 +13,14 @@ import lombok.ToString;
 @ToString
 public class Rating {
 	private String ratingId;
+	
 	private String userId;
+	
 	private String hotelId;
+	
 	private Hotel hotel;
+	
 	private int rating;
+	
 	private String feedBack;
 }
