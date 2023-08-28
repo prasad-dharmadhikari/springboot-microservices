@@ -18,10 +18,13 @@ import com.springboot.microservices.userservice.entities.User;
 import com.springboot.microservices.userservice.service.UserService;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
+	
+	int retryCount = 1;
 	
 	private Logger logger = LoggerFactory.getLogger(UserController.class);
 
@@ -34,15 +37,18 @@ public class UserController {
 	}
 	
 	@GetMapping("/{id}")
-	@CircuitBreaker(name = "ratingHotelBraker", fallbackMethod = "ratingHotelFallback")
+	//@CircuitBreaker(name = "ratingHotelBraker", fallbackMethod = "ratingHotelFallback")
+	@Retry(name = "ratingHotelService", fallbackMethod = "ratingHotelFallback")
 	public ResponseEntity<User> getUserById(@PathVariable("id") String userId) {
+		logger.info("Retry Count : {}",retryCount);
+		retryCount++;
 		return new ResponseEntity<>(userService.getUserByID(userId),HttpStatus.OK);
 	}
 	
 	//create ratingFallback method for circuit braker
 	
 	public ResponseEntity<User> ratingHotelFallback(String id, Exception ex) {
-		logger.info("Fall back is executed because service is down: ",ex.getMessage());
+		//logger.info("Fall back is executed because service is down: ",ex.getMessage());
 		User user = User.builder()
 			.email("dummy@gmail.com")
 			.name("Dummy Name")
