@@ -59,6 +59,7 @@ public class UserController {
 	}
 	
 	@GetMapping
+	@Retry(name = "ratingHotelService", fallbackMethod = "ratingHotelFallback")
 	public ResponseEntity<List<User>> getAllUsers() {
 		return ResponseEntity.ok(userService.getAllUsers());
 	}
